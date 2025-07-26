@@ -4,7 +4,6 @@ import openai
 
 app = Flask(__name__)
 
-# ✅ Get API key from environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/")
@@ -13,20 +12,24 @@ def index():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_input = request.json["message"]
-
     try:
+        user_message = request.json.get("message", "")
+
+        if not user_message:
+            return jsonify({"reply": "Kuch likho toh sahi!"})
+
         response = openai.ChatCompletion.create(
-            model="gpt-4-1106-preview",  # ya "gpt-3.5-turbo"
+            model="gpt-3.5-turbo",  # ya gpt-4 agar enabled ho
             messages=[
-                {"role": "user", "content": user_input}
+                {"role": "user", "content": user_message}
             ]
         )
-        reply = response.choices[0].message["content"]
-        return jsonify({"reply": reply})
+
+        bot_reply = response["choices"][0]["message"]["content"]
+        return jsonify({"reply": bot_reply.strip()})
 
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify({"reply": f"⚠️ Error: {str(e)}"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True)
