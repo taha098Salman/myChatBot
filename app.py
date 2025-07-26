@@ -1,10 +1,11 @@
+import os
 from flask import Flask, render_template, request, jsonify
 import openai
 
 app = Flask(__name__)
 
-# 🔑 Replace with your OpenAI API key
-openai.api_key = "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"
+# ✅ Get API key from environment variable
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/")
 def index():
@@ -16,16 +17,16 @@ def chat():
 
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # ya "gpt-4" agar use kar rahe ho
+            model="gpt-4-1106-preview",  # ya "gpt-3.5-turbo"
             messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": user_input},
+                {"role": "user", "content": user_input}
             ]
         )
-        reply = response["choices"][0]["message"]["content"]
+        reply = response.choices[0].message["content"]
         return jsonify({"reply": reply})
+
     except Exception as e:
-        return jsonify({"reply": f"Error: {str(e)}"})
+        return jsonify({"error": str(e)})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
