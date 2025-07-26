@@ -101,14 +101,19 @@
         input.value = "";
         chatBox.scrollTop = chatBox.scrollHeight;
 
-        const res = await fetch("/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message })
-        });
+        try {
+            const res = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message })
+            });
 
-        const data = await res.json();
-        chatBox.innerHTML += `<div><strong>Bot:</strong> ${data.reply}</div>`;
+            const data = await res.json();
+            chatBox.innerHTML += `<div><strong>Bot:</strong> ${data.reply}</div>`;
+        } catch (error) {
+            chatBox.innerHTML += `<div><strong>Bot:</strong> ⚠️ Server error hua bhai.</div>`;
+        }
+
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 </script>
